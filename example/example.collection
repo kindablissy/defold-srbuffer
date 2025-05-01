@@ -1,0 +1,14 @@
+name: "main"
+scale_along_z: 0
+embedded_instances {
+  id: "go"
+  data: "components {\n"
+  "  id: \"test\"\n"
+  "  component: \"/example/example.script\"\n"
+  "}\n"
+  "components {\n"
+  "  id: \"misc\"\n"
+  "  component: \"/example/misc.script\"\n"
+  "}\n"
+  ""
+}

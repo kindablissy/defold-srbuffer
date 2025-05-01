@@ -1,0 +1,17 @@
+[bootstrap]
+main_collection = /example/example.collectionc
+
+[script]
+shared_state = 1
+
+[display]
+width = 960
+height = 640
+
+[project]
+title = srbuffer
+dependencies#0 = https://github.com/Insality/panthera/archive/refs/tags/editor.894.zip
+
+[library]
+include_dirs = myextension
+

@@ -1,0 +1,198 @@
+function init(self)
+	self.srbuffer = srbuffer.create(1024);
+	local current_offset = 0;
+
+	srbuffer.writeint16(self.srbuffer, -1, 200);
+	srbuffer.writeint16(self.srbuffer, -1, 220);
+	srbuffer.writeint16(self.srbuffer, -1, 240);
+	pprint(srbuffer.readint16(self.srbuffer, 0));
+	pprint(srbuffer.readint16(self.srbuffer, -1));
+	pprint(srbuffer.readint16(self.srbuffer, -1));
+	srbuffer.reset(self.srbuffer, 0);
+	if false and true then return end;
+
+	local strs = {}
+	local int8 = {1,2,3,4,5,6,7,-8, 9}
+	local int16 = {1,2,3,4,5,6,-7,8888,-99990}
+	local int32 = {1,2,3,4,5,6,7,8,9}
+	local int64 = {1,2,3,4,5,6,7,8,-3999}
+	local uint8 = {1,2,3,4,5,6,7,8,255}
+	local uint16 = {1,2,3,4,5,6,7,8,65535}
+	local uint32 = {1,2,3,4,5,6,7,8, 4294967295}
+	local uint64 = {0, 1,2,3,4,5,6,7,0xfef9f9900, 6560565956}
+	local doubles = {1,2.3334,3,4.4005,5,6,7.9333,8000000.1,9}
+	local array = {1,32, 44, 54, 255,100 }
+
+	for i = 1, 10, 1 do
+		table.insert(strs, "coolboi" .. tostring(i));
+	end
+
+	--- Test Everything
+	-- Insert
+	for _, value in ipairs(strs) do
+		current_offset = current_offset + srbuffer.writecstring(self.srbuffer, current_offset, value);
+	end
+
+	for _, value in ipairs(int8) do
+		current_offset = current_offset + srbuffer.writeint8(self.srbuffer, current_offset, value);
+	end
+
+	for _, value in ipairs(int16) do
+		current_offset = current_offset +srbuffer.writeint16(self.srbuffer, current_offset, value);
+	end
+
+	for _, value in ipairs(int32) do
+		current_offset = current_offset +srbuffer.writeint32(self.srbuffer, current_offset, value);
+	end
+
+	for _, value in ipairs(int64) do
+		current_offset = current_offset +		srbuffer.writeint64(self.srbuffer, current_offset, value);
+	end
+
+	for _, value in ipairs(uint8) do
+		current_offset = current_offset +	srbuffer.writeuint8(self.srbuffer, current_offset, value);
+	end
+
+	for _, value in ipairs(uint16) do
+		current_offset = current_offset +	srbuffer.writeuint16(self.srbuffer, current_offset, value);
+	end
+
+	for _, value in ipairs(uint32) do
+		current_offset = current_offset +	srbuffer.writeuint32(self.srbuffer, current_offset, value);
+	end
+
+	for _, value in ipairs(uint64) do
+		current_offset = current_offset +	srbuffer.writeuint64(self.srbuffer, current_offset, value);
+	end
+
+	for _, value in ipairs(doubles) do
+		current_offset = current_offset +	srbuffer.writefloat64(self.srbuffer, current_offset, value);
+	end
+
+	current_offset = current_offset + srbuffer.writesimplearray(self.srbuffer, current_offset, array);
+
+	local serialized = self.srbuffer;
+
+	current_offset = 0;
+	pprint("string")
+	for _, value in ipairs(strs) do
+		local val, offset = srbuffer.readcstring(self.srbuffer, current_offset);
+		current_offset = offset + current_offset;
+		if val ~= value then
+			pprint("test failed", val, value);
+		else
+			pprint("test passed", val, value);
+		end
+	end
+
+	pprint("int8")
+	for _, value in ipairs(int8) do
+		local val, offset =  srbuffer.readint8(self.srbuffer, current_offset);
+		current_offset = offset + current_offset;
+		if val ~= value then
+			pprint("test failed", val, value);
+		else
+			pprint("test passed", val, value);
+		end
+	end
+
+	pprint("int16")
+	for _, value in ipairs(int16) do
+		local val, offset = srbuffer.readint16(self.srbuffer, current_offset);
+		current_offset = offset + current_offset;
+		if val ~= value then
+			pprint("test failed", val, value);
+		else
+			pprint("test passed", val, value);
+		end
+	end
+
+	pprint("int32")
+	for _, value in ipairs(int32) do
+		local val, offset = srbuffer.readint32(self.srbuffer, current_offset);
+		current_offset = offset + current_offset;
+		if val ~= value then
+			pprint("test failed", val, value);
+		else
+			pprint("test passed", val, value);
+		end
+	end
+
+	pprint("int64")
+	for _, value in ipairs(int64) do
+		local val, offset = srbuffer.readint64(self.srbuffer, current_offset);
+		current_offset = offset + current_offset;
+		if val ~= value then
+			pprint("test failed", val, value);
+		else
+			pprint("test passed", val, value);
+		end
+	end
+
+	pprint("uint8")
+	for _, value in ipairs(uint8) do
+		local val, offset = srbuffer.readuint8(self.srbuffer, current_offset);
+		current_offset = current_offset + offset;
+		if val ~= value then
+			pprint("test failed", val, value);
+		else
+			pprint("test passed", val, value);
+		end
+	end
+
+	pprint("uint16")
+	for _, value in ipairs(uint16) do
+		local val, offset = srbuffer.readuint16(self.srbuffer, current_offset);
+		current_offset = current_offset + offset;
+		if val ~= value then
+			pprint("test failed", val, value);
+		else
+			pprint("test passed", val, value);
+		end
+	end
+
+	pprint("uint32")
+	for _, value in ipairs(uint32) do
+		local val, offset = srbuffer.readuint32(self.srbuffer, current_offset);
+		current_offset = current_offset + offset;
+		if val ~= value then
+			pprint("test failed", val, value);
+		else
+			pprint("test passed", val, value);
+		end
+	end
+
+	pprint("uint64")
+	for _, value in ipairs(uint64) do
+		local val, offset = srbuffer.readuint64(self.srbuffer, current_offset);
+		current_offset = current_offset + offset;
+		if val ~= value then
+			pprint("test failed", val, value);
+		else
+			pprint("test passed", val, value);
+		end
+	end
+
+	pprint("doubles")
+	for _, value in ipairs(doubles) do
+		local val, offset = srbuffer.readfloat64(self.srbuffer, current_offset);
+		current_offset = current_offset + offset;
+		if val ~= value then
+			pprint("test failed", val, value);
+		else
+			pprint("test passed", val, value);
+		end
+	end
+
+	pprint("array")
+	for _, value in ipairs(array) do
+		local val, offset = srbuffer.readuint8(self.srbuffer, current_offset);
+		current_offset = current_offset + offset;
+		if val ~= value then
+			pprint("test failed", val, value);
+		else
+			pprint("test passed", val, value);
+		end
+	end
+
+end

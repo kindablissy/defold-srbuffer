@@ -1,0 +1,157 @@
+local function create_test_object()
+	return {
+		name = "John Doe",
+		age = 30,
+		black = "color",
+		lotaofarray = {
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+			1, 2, 3, 4, 5, 6, 7, 8, 9,
+		}
+	}
+end
+
+local serializer = srbuffer.create(1024 * 20);
+
+-- Benchmark the serialization using srbuffer
+local function benchmark_srbuffer()
+	local obj = create_test_object()
+	local current_offset = 0;
+	current_offset = current_offset + srbuffer.writecstring(serializer, current_offset, obj.name)
+	current_offset = current_offset + srbuffer.writeuint8(serializer, current_offset, obj.age)
+	current_offset = current_offset + srbuffer.writecstring(serializer, current_offset, obj.black)
+	current_offset = current_offset + srbuffer.writeuint32(serializer, current_offset, #obj.lotaofarray)
+	local lotofarray = obj.lotaofarray;
+	--srbuffer.writesimplearray(serializer, current_offset, lotofarray);
+	for i = 1, #lotofarray, 1 do
+		local value = lotofarray[i]
+		current_offset = current_offset + srbuffer.writeuint8(serializer, current_offset, value);
+	end
+
+	current_offset = 0;
+	local offset = 0;
+	_, offset =  srbuffer.readcstring(serializer, current_offset)
+	current_offset = offset + current_offset;
+	_, offset =  srbuffer.readuint8(serializer, current_offset)
+	current_offset = offset + current_offset;
+	_, offset =  srbuffer.readcstring(serializer, current_offset)
+	current_offset = offset + current_offset;
+	_, offset =  srbuffer.readuint32(serializer, current_offset)
+	current_offset = offset + current_offset;
+	local lotofarray = obj.lotaofarray;
+	for i = 1, #lotofarray, 1 do
+		_, offset = srbuffer.readuint8(serializer, current_offset);
+		current_offset = offset + current_offset;
+	end
+	return obj
+end
+
+-- Benchmark the serialization using json.encode
+local function benchmark_json_encode()
+	local obj = create_test_object()
+	local json_str = json.encode(obj)
+	local objback =  json.decode(json_str);
+	return json_str
+end
+
+-- Measure the time taken for srbuffer serialization
+local function measure_time(func)
+	local start_time = os.clock()
+	func()
+	local end_time = os.clock()
+	return end_time - start_time
+end
+
+-- Perform the benchmarking
+local function run_benchmark(iterations)
+	local json_time = measure_time(function()
+		for i = 0, iterations, 1 do
+			benchmark_json_encode()
+		end
+	end)
+	print(string.format("json.encode serialization took: %.8f seconds", json_time))
+	-- Benchmark srbuffer
+	local srbuffer_time = measure_time(function()
+		for i = 0, iterations, 1 do
+			benchmark_srbuffer()
+		end
+	end)
+	print(string.format("srbuffer serialization took: %.8f seconds", srbuffer_time))
+
+	-- Benchmark json.encode
+end
+function init(self)
+	if jit then
+		jit.off()
+	end
+end
+
+function final(self)
+	-- Add finalization code here
+	-- Remove this function if not needed
+end
+
+function update(self, dt)
+	run_benchmark(1000)
+end
+
+function on_message(self, message_id, message, sender)
+	-- Add message-handling code here
+	-- Remove this function if not nejjeded
+end
+
+function on_input(self, action_id, action)
+	-- Add input-handling code here
+	-- Remove this function if not needed
+end
+
+function on_reload(self)
+	-- Add reload-handling code here
+	-- Remove this function if not needed
+end
